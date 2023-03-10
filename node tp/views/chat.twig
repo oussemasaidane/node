@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <script src="/socket.io/socket.io.js"> </script>
+</head>
+
+<body>
+
+
+    <script>
+        const socket = io.connect();
+
+        socket.on('user-joined', (data) => {
+            h3 = document.createElement('h3');
+            h3.innerText = "a new user has joined"
+            document.body.appendChild(h3);
+        })
+
+        socket.on('msg', (data) => {
+            li = document.createElement('li');
+            console.log("msg on events" +data)
+            li.innerText = `${data.username} : ${data.msg}`
+            document.querySelector('.list-chat').appendChild(li);
+
+        })
+        socket.on('disconnect', () => {
+            socket.emit('disconnect')
+        })
+
+        socket.on('user disonnected' , (data) => {
+            const p = document.createElement('p')
+            p.innerText = data;
+            document.body.appendChild(p)
+        }) 
+
+        function send() {
+            const msg = document.querySelector('#chat').value
+            const username = document.getElementById('username').value
+            console.log({username,msg})
+            socket.emit('msg', {msg,username})
+        }
+
+        function userTyping(){
+            socket.emit('user typing','user typing');
+        }
+        socket.on('userTyping',(data) => {
+            const h1 = document.createElement('h1');
+            h1.innerText = data;
+            document.body.appendChild(h1);
+        })
+
+    </script>
+    <div class="chat">
+        <ul class="list-chat">
+
+        </ul>
+    </div>
+    <div style="display: flex; position: absolute; bottom: 10;">
+        <input type="text" name="chat" id="chat" placeholder="type here" onkeyup="userTyping()"/>
+        <input type="text" name="username" id="username" placeholder="username"/>
+
+        <button onclick="send()" type="submit"> send </button>
+    </div>
+</body>
+
+</html>
